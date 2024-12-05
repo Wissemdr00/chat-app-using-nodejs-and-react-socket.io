@@ -1,4 +1,4 @@
-export const baseUrl = `${import.meta.env.VITE_BASE_URL}/api`;
+export const baseUrl = "https://chat-app-wissem-dev.onrender.com/api";
 export const postRequest = async (url, body) => {
   const response = await fetch(url, {
     method: "POST",
