@@ -1,27 +1,9 @@
 {
-    "buildCommand": "npm run build",
-    "outputDirectory": "dist",
-    "framework": "vite",
-    "routes": [
+    "rewrites": [
       {
-        "src": "/(.*)",
-        "dest": "index.html"
+        "source": "/(.*)",
+        "destination": "index.html"
       }
-    ],
-    "build": {
-      
-      "rollupOptions": {
-        "output": {
-          "manualChunks": {
-            "vendor": [
-              "react",
-              "react-dom",
-              "react-router-dom",
-              "bootstrap",
-              "react-bootstrap"
-            ]
-          }
-        }
-      }
-    }
-}
+    ]
+    
+  }
