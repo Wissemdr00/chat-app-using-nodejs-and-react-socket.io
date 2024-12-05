@@ -9,7 +9,7 @@
       }
     ],
     "build": {
-      "chunkSizeWarningLimit": 600,
+      
       "rollupOptions": {
         "output": {
           "manualChunks": {
