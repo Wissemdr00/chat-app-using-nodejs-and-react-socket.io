@@ -3,14 +3,15 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const userRoute = require("./Routes/userRoute");
 const chatRoute = require("./Routes/chatRoute");
-const messageRoute = require("./Routes/messageRoute")
+const messageRoute = require("./Routes/messageRoute");
+const {Server} = require("socket.io");
 
 
 const app = express();
 require("dotenv").config();
 
 const corsOptions = {
-  origin: ["http://localhost:5174","http://localhost:5173", "http://localhost:3000"],
+  origin: true,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
@@ -30,6 +31,38 @@ mongoose.connect(uri)
   .then(() => console.log("MongoDB is connected"))
   .catch((err) => console.log(err));
 
-app.listen(port, () => {
+
+
+const expressServer = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+});
+
+const io = new Server(expressServer,{ cors: { origin: process.env.CLIENT_URL } });
+
+let onlineUsers = [];
+
+io.on("connection", (socket) => {
+  //listen to a connection
+  socket.on("addNewUser", (userId) => {
+    !onlineUsers.some((user) => user.userId === userId) &&
+      onlineUsers.push({
+        userId,
+        socketId: socket.id,
+      });
+    io.emit("getOnlineUsers", onlineUsers);
+  });
+  //add new message
+  socket.on("sendMessage", (message) => {
+    const user = onlineUsers.find((user) => user.userId === message.recipientId);
+    if (user) {
+      io.to(user.socketId).emit("getMessage", message);
+    }
+    });
+
+
+  socket.on("disconnect", () => {
+    onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
+
+    io.emit("getOnlineUsers", onlineUsers);
+  });
 });

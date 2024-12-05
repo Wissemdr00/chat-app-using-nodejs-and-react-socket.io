@@ -17,28 +17,49 @@ export const ChatContextProvider = ({ children, user }) => {
   const [isMessagesLoading,setIsMessagesLoading] = useState(false);
   const [isMessagesError,setIsMessagesError] = useState(null);
   const [sendTextMessageError,setSendTextMessageError] = useState(null);
-  const[newMessage,setNewMessage] = useState(null);
+  const[newMessage,setNewMessage] = useState([]);
   const [socket,setSocket] = useState(null);
   const [onlineUsers,setOnlineUsers] = useState([]);
   const { token } = useContext(AuthContext);
 
   useEffect(()=>{
-    const newSocket = io("http://localhost:3000");
+    const newSocket = io(import.meta.env.VITE_SOCKET_URL);
     setSocket(newSocket);
 
     return () => newSocket.disconnect();
   },[user]);
 
+  // Add user to online users
   useEffect(()=>{
     if (!socket) return;
     socket.emit("addNewUser",user?._id);
     socket.on("getOnlineUsers",(res) => {
       setOnlineUsers(res);
     });
+    return () => socket.off("getOnlineUsers");
   }
   ,[socket]);
 
-  console.log(messages);
+  //send messages
+  useEffect(()=>{
+    if (!socket) return;
+    
+    const recipientId = currentChat?.members?.find((id) => id !== user._id);
+
+    socket.emit("sendMessage",{...newMessage,recipientId });
+  }
+  ,[newMessage,socket]);
+
+  //reecive messages
+  useEffect(()=>{
+    if (!socket) return;
+    socket.on("getMessage",(message) => {
+      if (message.chatId !== currentChat._id) return;
+      setMessages((prevMessages) => [...prevMessages,message]);
+    });
+    return () => socket.off("getMessage");
+  } ,[socket,currentChat]);
+
   useEffect(()=>{
     const getUsers = async () => {
       const response = await getRequest(`${baseUrl}/users`);
@@ -137,7 +158,7 @@ export const ChatContextProvider = ({ children, user }) => {
     setLoading(false);
   }, []);
   return (
-    <ChatContext.Provider value={{messages,isMessagesError,isMessagesLoading,updateCurrentChat, createChat,potentialChats,error, loading, userChats, setUserChats,currentChat,sendTextMessage,}}>
+    <ChatContext.Provider value={{onlineUsers,messages,isMessagesError,isMessagesLoading,updateCurrentChat, createChat,potentialChats,error, loading, userChats, setUserChats,currentChat,sendTextMessage,}}>
       {children}
     </ChatContext.Provider>
   );
