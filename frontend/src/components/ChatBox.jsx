@@ -8,11 +8,11 @@ import InputEmoji from "react-input-emoji";
 
 const ChatBox = () => {
   const { user } = useContext(AuthContext);
-  const { messages, isMessagesError, isMessagesLoading, currentChat } =
+  const { sendTextMessage,messages, isMessagesError, isMessagesLoading, currentChat } =
     useContext(ChatContext);
   const { recipient } = useFetchRecipient(currentChat, user);
   const [textMessage, setTextMessage] = useState("");
-  console.log(textMessage);
+
 
   if (!currentChat) {
     return (
@@ -56,12 +56,12 @@ const ChatBox = () => {
           cleanOnEnter
           fontfamily="nunito"
           borderColor="#333"
-          onEnter={(text) => {
-            console.log(text);
+          onEnter={() => {
+            sendTextMessage(textMessage, user, setTextMessage);
           }}
           placeholder="Type a message..."
         />
-        <button className="send-btn">
+        <button className="send-btn" onClick={()=> {sendTextMessage(textMessage, user, setTextMessage)}}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"

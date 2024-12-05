@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { baseUrl, getRequest, postRequest } from "../utils/services";
 import { AuthContext } from "./AuthContext";
+import {io} from "socket.io-client";
+
 
 export const ChatContext = createContext(AuthContext);
 
@@ -14,8 +16,27 @@ export const ChatContextProvider = ({ children, user }) => {
   const [messages,setMessages] = useState([]);
   const [isMessagesLoading,setIsMessagesLoading] = useState(false);
   const [isMessagesError,setIsMessagesError] = useState(null);
+  const [sendTextMessageError,setSendTextMessageError] = useState(null);
+  const[newMessage,setNewMessage] = useState(null);
+  const [socket,setSocket] = useState(null);
+  const [onlineUsers,setOnlineUsers] = useState([]);
+  const { token } = useContext(AuthContext);
 
-  const token = localStorage.getItem("token");
+  useEffect(()=>{
+    const newSocket = io("http://localhost:3000");
+    setSocket(newSocket);
+
+    return () => newSocket.disconnect();
+  },[user]);
+
+  useEffect(()=>{
+    if (!socket) return;
+    socket.emit("addNewUser",user?._id);
+    socket.on("getOnlineUsers",(res) => {
+      setOnlineUsers(res);
+    });
+  }
+  ,[socket]);
 
   console.log(messages);
   useEffect(()=>{
@@ -86,11 +107,13 @@ export const ChatContextProvider = ({ children, user }) => {
       JSON.stringify({ chatId: currentChat._id ,senderId: sender._id,text: textMessage })
     );
     if (response.error) {
-      return setError(response.message);
+      return setSendTextMessageError(response);
     }
     setMessages((prevMessages) => {
       return [...prevMessages, response];
     });
+    setNewMessage(response);
+    setTextMessage("");
   }, [currentChat]);
 
   const updateCurrentChat = useCallback((chat) => {
@@ -114,7 +137,7 @@ export const ChatContextProvider = ({ children, user }) => {
     setLoading(false);
   }, []);
   return (
-    <ChatContext.Provider value={{messages,isMessagesError,isMessagesLoading,updateCurrentChat, createChat,potentialChats,error, loading, userChats, setUserChats,currentChat }}>
+    <ChatContext.Provider value={{messages,isMessagesError,isMessagesLoading,updateCurrentChat, createChat,potentialChats,error, loading, userChats, setUserChats,currentChat,sendTextMessage,}}>
       {children}
     </ChatContext.Provider>
   );
