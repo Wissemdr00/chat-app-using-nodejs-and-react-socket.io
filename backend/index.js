@@ -11,7 +11,9 @@ const app = express();
 require("dotenv").config();
 
 const corsOptions = {
-  origin: true,
+  origin: [ "https://chatappwissem-3ze0zuhfv-wissemdr00s-projects.vercel.app",
+    "https://chatappwissemdev-woad.vercel.app",
+    process.env.CLIENT_URL],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
