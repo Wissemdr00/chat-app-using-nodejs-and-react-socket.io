@@ -12,21 +12,21 @@ const createToken = (_id) => {
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
+    console.log(name);
     let user = await userModel.findOne({ email });
 
     if (user) {
-      return res.status(400).json({ msg: "User already exists" });
+      return res.status(400).json("User already exists");
     }
 
     if (!name || !email || !password)
       return res.status(400).json("all fields are required");
 
     if (!validator.isEmail(email))
-      return res.status(400).json({ msg: "Invalid email" });
+      return res.status(400).json("invalid email");
 
     if (!validator.isStrongPassword(password))
-      return res.status(400).json({ msg: "Password is weak" });
+      return res.status(400).json("password is weak");
 
     user = new userModel({ name, email, password });
 
@@ -50,13 +50,13 @@ const loginUser = async (req, res) => {
   try {
     let user = await userModel.findOne({ email });
     if (!user) {
-      return res.status(400).json({ msg: "Invalid Credentials" });
+      return res.status(400).json("Invalid Credentials" );
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ msg: "Invalid Credentials" });
+      return res.status(400).json( "Invalid Credentials");
     }
 
     const token = createToken(user._id);
@@ -65,7 +65,7 @@ const loginUser = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    res.status(500).json({ msg: "Server Error" });
+    res.status(500).json( "Server Error" );
   }
 };
 
@@ -84,7 +84,7 @@ const findUser = async (req, res) => {
 
 const getUsers= async (req, res) => {
   try {
-    const users = await userModel.find().select("-password");
+    const users = await userModel.find()
     res.status(200).json(users);
   } catch (error) {
     console.log(error);

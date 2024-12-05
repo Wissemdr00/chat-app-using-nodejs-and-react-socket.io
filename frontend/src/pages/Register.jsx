@@ -3,7 +3,7 @@ import { Form, Button, Col, Row, Stack, Card, Alert } from "react-bootstrap";
 import { AuthContext } from "../context/AuthContext";
 
 const Register = () => {
-  const { registerInfo, updateRegisterInfo,registerUser ,registererror,loading} = useContext(AuthContext);
+  const { registerInfo, updateRegisterInfo,registerUser ,registerError,loading} = useContext(AuthContext);
   return (
     <>
       <Form onSubmit={registerUser}>
@@ -65,10 +65,10 @@ const Register = () => {
               <a href="/login">Login</a>
             </Stack>
             {
-                registererror?.error && 
+                registerError? 
                 <Alert variant="danger">
-                    <p>{registererror?.message}</p>
-                </Alert>
+                    <p>{registerError}</p>
+                </Alert> : null
             }
           </Card>
         </div>

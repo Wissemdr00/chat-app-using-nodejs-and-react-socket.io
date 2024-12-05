@@ -11,9 +11,12 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "moment": "^2.30.1",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.6",
     "react-dom": "^18.3.1",
+    "react-input-emoji": "^5.9.0",
     "react-router-dom": "^7.0.1"
   },
   "devDependencies": {
