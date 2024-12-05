@@ -1,9 +1,27 @@
 {
-    "rewrites": [
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist",
+    "framework": "vite",
+    "routes": [
       {
-        "source": "/(.*)",
-        "destination": "index.html"
+        "src": "/(.*)",
+        "dest": "index.html"
       }
-    ]
-    
-  }
+    ],
+    "build": {
+      "chunkSizeWarningLimit": 600,
+      "rollupOptions": {
+        "output": {
+          "manualChunks": {
+            "vendor": [
+              "react",
+              "react-dom",
+              "react-router-dom",
+              "bootstrap",
+              "react-bootstrap"
+            ]
+          }
+        }
+      }
+    }
+}
