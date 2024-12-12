@@ -18,10 +18,13 @@ const UserChat = ({ chat, user }) => {
   const isOnline=onlineUsers.some((user)=>user.userId===recipient?._id);
 
   
-  const truncateText=(text)=>{
+  const truncateText=(text,senderId)=>{
     let shortText=text.substring(0,20);
     if(text.length>20){
       shortText+="...";
+    }
+    if(senderId===user._id){
+      return "You: "+shortText;
     }
     return shortText;
   }
@@ -44,7 +47,7 @@ const UserChat = ({ chat, user }) => {
         <div className="text-content">
           <div className="name">{recipient?.name}</div>
           <div className="text">{
-            lastMessage?.text?truncateText(lastMessage.text):"Start a conversation"
+            lastMessage?.text?truncateText(lastMessage.text,lastMessage.senderId):"Start a conversation"
             }</div>
         </div>
       </div>
