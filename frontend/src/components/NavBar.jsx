@@ -2,6 +2,7 @@ import { Container, Nav, Navbar } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
+import Notification from "./Notification";
 
 const NavBar = () => {
   const { user, logoutUser } = useContext(AuthContext);
@@ -17,10 +18,12 @@ const NavBar = () => {
           {user ? "Logged in as " + user.name : null}
         </span>
         
-          {user ? (
+          {user ? (<div style={{display:"flex"}}>
+            <Notification />
             <Link to="/" className="nav-link text-white" onClick={logoutUser}>
               Logout
             </Link>
+          </div>
           ) : (
             <Nav>
               <Link to="/login" className="nav-link text-white">Login</Link>

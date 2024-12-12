@@ -4,42 +4,44 @@ const mongoose = require("mongoose");
 const userRoute = require("./Routes/userRoute");
 const chatRoute = require("./Routes/chatRoute");
 const messageRoute = require("./Routes/messageRoute");
-const {Server} = require("socket.io");
-
+const { Server } = require("socket.io");
 
 const app = express();
 require("dotenv").config();
 
 const corsOptions = {
-  origin: [ "https://chatappwissem-3ze0zuhfv-wissemdr00s-projects.vercel.app",
+  origin: [
+    "https://chatappwissem-3ze0zuhfv-wissemdr00s-projects.vercel.app",
     "https://chatappwissemdev-woad.vercel.app",
-    process.env.CLIENT_URL],
+    process.env.CLIENT_URL,
+  ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
 
-app.use("/api/messages",messageRoute)
+app.use("/api/messages", messageRoute);
 app.use("/api/users", userRoute);
 app.use("/api/chats", chatRoute);
 
 const port = process.env.PORT || 5000;
 const uri = process.env.ATLAS_URI;
 
-mongoose.connect(uri)
+mongoose
+  .connect(uri)
   .then(() => console.log("MongoDB is connected"))
   .catch((err) => console.log(err));
-
-
 
 const expressServer = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-const io = new Server(expressServer,{ cors: { origin: process.env.CLIENT_URL } });
+const io = new Server(expressServer, {
+  cors: { origin: process.env.CLIENT_URL },
+});
 
 let onlineUsers = [];
 
@@ -55,12 +57,18 @@ io.on("connection", (socket) => {
   });
   //add new message
   socket.on("sendMessage", (message) => {
-    const user = onlineUsers.find((user) => user.userId === message.recipientId);
+    const user = onlineUsers.find(
+      (user) => user.userId === message.recipientId
+    );
     if (user) {
       io.to(user.socketId).emit("getMessage", message);
+      io.to(user.socketId).emit("getNotification", {
+        senderId: message.senderId,
+        isRead: false,
+        date: new Date(),
+      });
     }
-    });
-
+  });
 
   socket.on("disconnect", () => {
     onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
