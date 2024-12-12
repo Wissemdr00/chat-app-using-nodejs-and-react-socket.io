@@ -227,7 +227,7 @@ export const ChatContextProvider = ({ children, user }) => {
   }
   ,[notifications]);
   return (
-    <ChatContext.Provider value={{markThisNotificationsAsread,markNotificationAsRead,markAllNotificationsAsRead, allUsers,notifications,onlineUsers,messages,isMessagesError,isMessagesLoading,updateCurrentChat, createChat,potentialChats,error, loading, userChats, setUserChats,currentChat,sendTextMessage,}}>
+    <ChatContext.Provider value={{markThisNotificationsAsread,markNotificationAsRead,markAllNotificationsAsRead, allUsers,notifications,onlineUsers,messages,isMessagesError,isMessagesLoading,updateCurrentChat, createChat,potentialChats,error, loading, userChats, setUserChats,currentChat,sendTextMessage,newMessage}}>
       {children}
     </ChatContext.Provider>
   );
